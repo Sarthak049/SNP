@@ -21,22 +21,15 @@ struct dummy{
 	struct semaphore sem;
 }device;
 
-void printmess(char* s)
-{
-	printk(KERN_ALERT DEVICE_NAME);
-	printk(KERN_ALERT " : %s",s);
-	printk(KERN_ALERT "\n");
-}
-
 int device_open(struct inode *node,struct file *fp)
 {
-	if(down_interuptible(&device.sem) != 0)
+	printk(KERN_ALERT "Atempting to open device file\n");
+	if(down_interruptible(&device.sem) != 0)
 	{
 		printk(KERN_ALERT "%s : Unable to Lock file while open\n",DEVICE_NAME);
 		return -1;
 	}
-	printk(KERN_ALERT DEVICE_NAME);
-	printk(KERN_ALERT " : File open operation Complete\n");
+	printk(KERN_ALERT "File open operation Complete\n");
 	return 0;
 }
 
@@ -51,16 +44,18 @@ ssize_t device_read(struct file* fp,char* buffer, size_t bufsize, loff_t* buffof
 ssize_t device_write(struct file* fp,const char* buffer, size_t bufsize, loff_t* buffoff)
 {
 	printk(KERN_ALERT "Writing to the device...\n");
-	ret = copy_to_user(device.string,buffer,bufsize);
+	ret = copy_from_user(device.string,buffer,bufsize);
+	printk(KERN_ALERT "%s\n",device.string);
+	printk(KERN_ALERT "Written\n");
 	device.length = bufsize;
 	return ret;
 }
 
 int device_close(struct inode* node, struct file* fp)
 {
-	printmess("Closing Device File");
+	printk(KERN_ALERT "Closing Device File");
 	up(&device.sem);
-	printmess("Device Close Successfully");
+	printk(KERN_ALERT "Device Close Successfully");
 	return 0;
 }
 
@@ -91,6 +86,7 @@ static int hello_init(void)
 	{
 		printk(KERN_ALERT "%s : Unable to Register Device Driver\n",DEVICE_NAME);
 	}
+	sema_init(&device.sem,1);
 	printk(KERN_ALERT "Successfully Initialised Device Driver\n");
 	return 0;
 }
