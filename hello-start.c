@@ -2,6 +2,8 @@
 #include<linux/module.h>
 #include<linux/cdev.h>
 #include<linux/fs.h>
+#include<linux/semaphore.h>
+#include<asm/uaccess.h>
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Sarthak Jain");
@@ -12,6 +14,63 @@ int maj_no;
 int ret;
 dev_t crdev;
 #define DEVICE_NAME "CryptoDevCHARDEVDRVR"
+
+struct dummy{
+	char string[100];
+	int length;
+	struct semaphore sem;
+}device;
+
+void printmess(char* s)
+{
+	printk(KERN_ALERT DEVICE_NAME);
+	printk(KERN_ALERT " : %s",s);
+	printk(KERN_ALERT "\n");
+}
+
+int device_open(struct inode *node,struct file *fp)
+{
+	if(down_interuptable(&device.sem) != 0)
+	{
+		printk(KERN_ALERT "%s : Unable to Lock file while open\n",DEVICE_NAME);
+		return -1;
+	}
+	printk(KERN_ALERT DEVICE_NAME);
+	printk(KERN_ALERT " : File open operation Complete\n");
+	return 0;
+}
+
+ssize_t device_read(struct file* fp,char* buffer, size_t bufsize, loff_t* buffoff)
+{
+	printk(KERN_ALERT "Reading from the device...\n")
+	ret = copy_to_user(buffer,device.string,bufsize);
+	device.length = bufsize;
+	return ret;
+}
+
+ssize_t device_write(struct file* fp,const char* buffer, size_t bufsize, loff_t* buffoff)
+{
+	printk(KERN_ALERT "Writing to the device...\n")
+	ret = copy_to_user(device.string,buffer,bufsize);
+	device.length = bufsize;
+	return ret;
+}
+
+int device_close(struct inode* node, struct file* fp)
+{
+	printmess("Closing Device File");
+	up(&device.sem);
+	printmess("Device Close Successfully")
+	return 0;
+}
+
+struct file_operations fop = {
+	.owner = THIS_MODULE,
+	.open = device_open,
+	.release = device_close,
+	.read = device_read,
+	.write = device_write
+}
 
 static int hello_init(void)
 {
@@ -25,6 +84,7 @@ static int hello_init(void)
 	maj_no = MAJOR(crdev);
 	printk(KERN_ALERT "%s : Major Number:%d\n",DEVICE_NAME,maj_no);
 	newDev = cdev_alloc();
+	newDev->ops = &fop;
 	newDev->owner = THIS_MODULE;
 	ret = cdev_add(newDev,crdev,1);
 	if(ret < 0)
