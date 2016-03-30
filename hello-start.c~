@@ -30,7 +30,7 @@ void printmess(char* s)
 
 int device_open(struct inode *node,struct file *fp)
 {
-	if(down_interuptable(&device.sem) != 0)
+	if(down_interuptible(&device.sem) != 0)
 	{
 		printk(KERN_ALERT "%s : Unable to Lock file while open\n",DEVICE_NAME);
 		return -1;
@@ -42,7 +42,7 @@ int device_open(struct inode *node,struct file *fp)
 
 ssize_t device_read(struct file* fp,char* buffer, size_t bufsize, loff_t* buffoff)
 {
-	printk(KERN_ALERT "Reading from the device...\n")
+	printk(KERN_ALERT "Reading from the device...\n");
 	ret = copy_to_user(buffer,device.string,bufsize);
 	device.length = bufsize;
 	return ret;
@@ -50,7 +50,7 @@ ssize_t device_read(struct file* fp,char* buffer, size_t bufsize, loff_t* buffof
 
 ssize_t device_write(struct file* fp,const char* buffer, size_t bufsize, loff_t* buffoff)
 {
-	printk(KERN_ALERT "Writing to the device...\n")
+	printk(KERN_ALERT "Writing to the device...\n");
 	ret = copy_to_user(device.string,buffer,bufsize);
 	device.length = bufsize;
 	return ret;
@@ -60,7 +60,7 @@ int device_close(struct inode* node, struct file* fp)
 {
 	printmess("Closing Device File");
 	up(&device.sem);
-	printmess("Device Close Successfully")
+	printmess("Device Close Successfully");
 	return 0;
 }
 
@@ -70,7 +70,7 @@ struct file_operations fop = {
 	.release = device_close,
 	.read = device_read,
 	.write = device_write
-}
+};
 
 static int hello_init(void)
 {

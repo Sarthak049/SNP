@@ -629,6 +629,12 @@ deps_/mnt/hgfs/WORK/GitHub/CryptoDev/SNP/hello-start.o := \
   include/uapi/linux/fcntl.h \
   arch/x86/include/uapi/asm/fcntl.h \
   include/uapi/asm-generic/fcntl.h \
+  arch/x86/include/asm/uaccess.h \
+    $(wildcard include/config/x86/intel/usercopy.h) \
+    $(wildcard include/config/debug/strict/user/copy/checks.h) \
+  arch/x86/include/asm/smap.h \
+    $(wildcard include/config/x86/smap.h) \
+  arch/x86/include/asm/uaccess_64.h \
 
 /mnt/hgfs/WORK/GitHub/CryptoDev/SNP/hello-start.o: $(deps_/mnt/hgfs/WORK/GitHub/CryptoDev/SNP/hello-start.o)
 
