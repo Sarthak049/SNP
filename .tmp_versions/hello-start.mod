@@ -1,2 +1,2 @@
-/mnt/hgfs/WORK/GitHub/CryptoDev/SNP/hello-start.ko
-/mnt/hgfs/WORK/GitHub/CryptoDev/SNP/hello-start.o
+/home/draco/Desktop/WORK/GitHub/CryptoDev/SNP/hello-start.ko
+/home/draco/Desktop/WORK/GitHub/CryptoDev/SNP/hello-start.o

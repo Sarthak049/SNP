@@ -4,6 +4,7 @@
 #include<linux/fs.h>
 #include<linux/semaphore.h>
 #include<asm/uaccess.h>
+#include<linux/kmod.h>
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Sarthak Jain");
@@ -67,10 +68,10 @@ struct file_operations fop = {
 	.write = device_write
 };
 
+
 static int hello_init(void)
 {
-	printk(KERN_ALERT "This is my first kernel module\n");
-	ret = alloc_chrdev_region(&crdev,0,1,DEVICE_NAME);
+	ret = alloc_chrdev_region(&crdev,0,50,DEVICE_NAME);
 	if(ret < 0)
 	{
 		printk(KERN_ALERT "\n%s : Unable to assign Character Device Driver Region",DEVICE_NAME);
@@ -81,13 +82,14 @@ static int hello_init(void)
 	newDev = cdev_alloc();
 	newDev->ops = &fop;
 	newDev->owner = THIS_MODULE;
-	ret = cdev_add(newDev,crdev,1);
+	ret = cdev_add(newDev,crdev,50);
 	if(ret < 0)
 	{
 		printk(KERN_ALERT "%s : Unable to Register Device Driver\n",DEVICE_NAME);
 	}
 	sema_init(&device.sem,1);
 	printk(KERN_ALERT "Successfully Initialised Device Driver\n");
+	printk(KERN_ALERT "Test caller");
 	return 0;
 }
 
@@ -95,7 +97,7 @@ static void hello_destroy(void)
 {
 	printk(KERN_ALERT "Killing Hello-Start.c ... Byeeee\n");
 	cdev_del(newDev);
-	unregister_chrdev_region(crdev,1);
+	unregister_chrdev_region(crdev,50);
 	printk(KERN_ALERT "%s : Successfully Unregistered Driver\n",DEVICE_NAME);
 	printk(KERN_ALERT "Done");
 }
