@@ -1,0 +1,26 @@
+========================================== Pre-Requisites ==============================================================
+Linux Disto (preferably Ubuntu)
+gtk 2.0 (pre-installed in some versions of ubuntu)
+
+
+################Libraries###################
+<linux/kernel.h>
+<linux/module.h>
+<linux/cdev.h>
+<linux/kmod.h>
+
+The module is successfully compiled and tested on ubuntu 14.04 LTE. Since some Linux distro don't give complete control to user, some libraries might be missing from the distro, resulting in compilation error.
+
+========================================== STEPS TO RUN =================================================================
+
+1. Download Files from the Git Repository and Place it into /home/<username>/cryptodev directory
+
+2. change directory to "$cd cryptodev".
+
+3. Make the kernel module using given makefile i.e "$make" (If there is any error during make it might be due to kernel version, please contact me at sarthakjain10.11@gmail.com).
+
+4. Insert the downloaded kernel module into the kernel using command - "sudo insmod hello-start.ko"
+
+5. Run the user end application using script - "$bash suscript.sh".
+
+6. To remove the kernel module use the command - "$rmmod hello-start.ko".
